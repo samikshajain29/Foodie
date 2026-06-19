@@ -5,6 +5,8 @@ import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { serverUrl } from "../App";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "../../firebase";
 
 function SignUp() {
   const primaryColor = "#ff4d2d";
@@ -19,6 +21,7 @@ function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mobile, setMobile] = useState("");
+  const [error, setError] = useState("");
 
   const handleSignup = async () => {
     try {
@@ -34,8 +37,33 @@ function SignUp() {
         { withCredentials: true },
       );
       console.log(result.data);
+      setError("");
     } catch (error) {
+      setError(error?.response?.data?.message);
       console.log(error.response?.data);
+    }
+  };
+
+  const handleGoogleAuth = async () => {
+    if (!mobile) {
+      return setError("mobile no. is required");
+    }
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+    try {
+      const { data } = await axios.post(
+        `${serverUrl}/api/auth/google-auth`,
+        {
+          fullName: result.user.displayName,
+          email: result.user.email,
+          role,
+          mobile,
+        },
+        { withCredentials: true },
+      );
+      console.log(data);
+    } catch (error) {
+      console.log(error);
     }
   };
   return (
@@ -77,6 +105,7 @@ function SignUp() {
             }}
             onChange={(e) => setFullName(e.target.value)}
             value={fullName}
+            required
           />
         </div>
 
@@ -98,6 +127,7 @@ function SignUp() {
             }}
             onChange={(e) => setEmail(e.target.value)}
             value={email}
+            required
           />
         </div>
         {/* mobile */}
@@ -118,6 +148,7 @@ function SignUp() {
             }}
             onChange={(e) => setMobile(e.target.value)}
             value={mobile}
+            required
           />
         </div>
 
@@ -140,6 +171,7 @@ function SignUp() {
               }}
               onChange={(e) => setPassword(e.target.value)}
               value={password}
+              required
             />
             <button
               className="absolute right-3.5 top-3.5 text-gray-500 cursor-pointer"
@@ -183,7 +215,11 @@ function SignUp() {
         >
           Sign Up
         </button>
-        <button className="w-full mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200 border-gray-400 hover:bg-gray-100 cursor-pointer">
+        {error && <p className="text-red-500 text-center my-2.5">*{error}</p>}
+        <button
+          className="w-full mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200 border-gray-400 hover:bg-gray-100 cursor-pointer"
+          onClick={handleGoogleAuth}
+        >
           <FcGoogle size={20} />
           <span>Sign up with Google</span>
         </button>

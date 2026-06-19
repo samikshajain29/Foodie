@@ -5,6 +5,8 @@ import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { serverUrl } from "../App";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "../../firebase";
 
 function SignIn() {
   const primaryColor = "#ff4d2d";
@@ -16,6 +18,7 @@ function SignIn() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleSignIn = async () => {
     try {
@@ -28,6 +31,24 @@ function SignIn() {
         { withCredentials: true },
       );
       console.log(result.data);
+      setError("");
+    } catch (error) {
+      setError(error?.response?.data?.message);
+      console.log(error);
+    }
+  };
+  const handleGoogleAuth = async () => {
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+    try {
+      const { data } = await axios.post(
+        `${serverUrl}/api/auth/google-auth`,
+        {
+          email: result.user.email,
+        },
+        { withCredentials: true },
+      );
+      console.log(data);
     } catch (error) {
       console.log(error);
     }
@@ -71,6 +92,7 @@ function SignIn() {
             }}
             onChange={(e) => setEmail(e.target.value)}
             value={email}
+            required
           />
         </div>
 
@@ -93,6 +115,7 @@ function SignIn() {
               }}
               onChange={(e) => setPassword(e.target.value)}
               value={password}
+              required
             />
             <button
               className="absolute right-3.5 top-3.5 text-gray-500 cursor-pointer"
@@ -115,7 +138,11 @@ function SignIn() {
         >
           Sign In
         </button>
-        <button className="w-full mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200 border-gray-400 hover:bg-gray-100 cursor-pointer">
+        {error && <p className="text-red-500 text-center my-2.5">*{error}</p>}
+        <button
+          className="w-full mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200 border-gray-400 hover:bg-gray-100 cursor-pointer"
+          onClick={handleGoogleAuth}
+        >
           <FcGoogle size={20} />
           <span>Sign In with Google</span>
         </button>

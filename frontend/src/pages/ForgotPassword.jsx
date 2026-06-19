@@ -10,6 +10,7 @@ function ForgotPassword() {
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleSendOtp = async () => {
@@ -20,8 +21,10 @@ function ForgotPassword() {
         { withCredentials: true },
       );
       console.log(result.data);
+      setError("");
       setStep(2);
     } catch (error) {
+      setError(error?.response?.data?.message);
       console.log(error);
     }
   };
@@ -33,8 +36,10 @@ function ForgotPassword() {
         { withCredentials: true },
       );
       console.log(result.data);
+      setError("");
       setStep(3);
     } catch (error) {
+      setError(error?.response?.data?.message);
       console.log(error);
     }
   };
@@ -49,8 +54,10 @@ function ForgotPassword() {
         { withCredentials: true },
       );
       console.log(result.data);
+      setError("");
       navigate("/signin");
     } catch (error) {
+      setError(error?.response?.data?.message);
       console.log(error);
     }
   };
@@ -83,6 +90,7 @@ function ForgotPassword() {
                 placeholder="Enter your Email"
                 onChange={(e) => setEmail(e.target.value)}
                 value={email}
+                required
               />
             </div>
             <button
@@ -91,6 +99,9 @@ function ForgotPassword() {
             >
               Send Otp
             </button>
+            {error && (
+              <p className="text-red-500 text-center my-2.5">*{error}</p>
+            )}
           </div>
         )}
 
@@ -110,6 +121,7 @@ function ForgotPassword() {
                 placeholder="Enter OTP"
                 onChange={(e) => setOtp(e.target.value)}
                 value={otp}
+                required
               />
             </div>
             <button
@@ -118,6 +130,9 @@ function ForgotPassword() {
             >
               Verify
             </button>
+            {error && (
+              <p className="text-red-500 text-center my-2.5">*{error}</p>
+            )}
           </div>
         )}
 
@@ -137,6 +152,7 @@ function ForgotPassword() {
                 placeholder="Enter New Password"
                 onChange={(e) => setNewPassword(e.target.value)}
                 value={newPassword}
+                required
               />
             </div>
             <div className="mb-6">
@@ -153,6 +169,7 @@ function ForgotPassword() {
                 placeholder="Confirm Password"
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 value={confirmPassword}
+                required
               />
             </div>
             <button
@@ -161,6 +178,9 @@ function ForgotPassword() {
             >
               Reset Password
             </button>
+            {error && (
+              <p className="text-red-500 text-center my-2.5">*{error}</p>
+            )}
           </div>
         )}
       </div>

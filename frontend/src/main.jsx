@@ -5,6 +5,7 @@ import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 const serverUrl = "http://localhost:8000";
+import { store } from "./redux/store.js";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>

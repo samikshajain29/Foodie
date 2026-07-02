@@ -8,7 +8,7 @@ export const createEditShop = async (req, res) => {
     if (req.file) {
       image = await uploadOnCloudinary(req.file.path);
     }
-    let shop = await shop.findOne({ owner: req.userId });
+    let shop = await Shop.findOne({ owner: req.userId });
     if (!shop) {
       shop = await Shop.create({
         name,
